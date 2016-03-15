@@ -46,7 +46,8 @@ app.Animation1.prototype.update = function(dt) {
             if (distanceToEye1 < distanceToEye2) {
                 distanceToCloserEye = distanceToEye1;
                 positionOfCloserEye = this.positionOfEye1;
-            } else {
+            } 
+            else {
                 distanceToCloserEye = distanceToEye2;
                 positionOfCloserEye = this.positionOfEye2;
             }
@@ -54,18 +55,24 @@ app.Animation1.prototype.update = function(dt) {
             if (distanceToCloserEye > this.distanceBeingMoved) {
                 particle.state = this.States.MOVING_TO_EYE;
                 particle.setToMoveWithAcceleration(new THREE.Vector3(0, 0, 1), positionOfCloserEye, this.timeToMoveThroughEye);
+                particle.startColor = new THREE.Color(0xffff00);
+                particle.endColor = new THREE.Color(0xffa500);
             }
         } 
         else if (particle.state == this.States.MOVING_TO_EYE) {
             if (particle.t > this.timeToMoveThroughEye) {
                 particle.state = this.States.MOVING_TO_BUNCH;
                 particle.setToMoveWithVelocity(particle.getCurrentVelocity(), this.positionToBunchAt, this.timeToMoveToBunch);
+                particle.startColor = new THREE.Color(0xffa500);
+                particle.endColor = new THREE.Color(0xffa500);
             }
         } 
         else if (particle.state == this.States.MOVING_TO_BUNCH) {
             if (particle.t > this.timeToMoveToBunch - 0.01) {
                 particle.state = this.States.WAITING_AT_BUNCH;
                 particle.setNotMoving();
+                particle.startColor = new THREE.Color(0xffa500);
+                particle.endColor = new THREE.Color(0xff0000);
             }
         } 
         else if (particle.state == this.States.WAITING_AT_BUNCH) {
@@ -73,6 +80,8 @@ app.Animation1.prototype.update = function(dt) {
                 particle.state = this.States.MOVING_BACK_TO_ORIGINAL_POSITION;
                 var randomVelocity = new THREE.Vector3(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
                 particle.setToMoveWithVelocity(randomVelocity, particle.positionInSkull, this.timeToMoveBackToOriginalPosition);
+                particle.startColor = new THREE.Color(0xff0000);
+                particle.endColor = new THREE.Color(0xffff00);
             }
         } 
         else if (particle.state == this.States.MOVING_BACK_TO_ORIGINAL_POSITION) {
@@ -81,6 +90,8 @@ app.Animation1.prototype.update = function(dt) {
                 this.distanceBeingMoved = 3;
                 particle.resetPosition();
                 particle.setNotMoving();  
+                particle.startColor = new THREE.Color(0xffff00);
+                particle.endColor = new THREE.Color(0xffff00);
             }
         }
     }

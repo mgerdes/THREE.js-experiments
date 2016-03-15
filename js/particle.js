@@ -3,11 +3,14 @@ var app = app || { };
 app.Particle = function(position, color) {
     this.position = position;
     this.color = color;
+    this.startColor = color.clone();
+    this.endColor = color.clone();
     this.positionInSkull = position.clone();
     this.a0 = new THREE.Vector3(0, 0, 0);
     this.v0 = new THREE.Vector3(0, 0, 0);
     this.p0 = position.clone();
     this.t = 0;
+    this.timeToFinish = 0;
     this.state = 0;
 };
 
@@ -24,6 +27,7 @@ app.Particle.prototype.setToMoveWithAcceleration = function(a, p, t) {
     this.a0.y = a.y;
     this.a0.z = a.z;
 
+    this.timeToFinish = t;
     this.t = 0;
 };
 
@@ -40,6 +44,7 @@ app.Particle.prototype.setToMoveWithVelocity = function(v, p, t) {
     this.a0.y = (p.y - this.position.y - v.y*t) / (1/2*t*t);
     this.a0.z = (p.z - this.position.z - v.z*t) / (1/2*t*t);
 
+    this.timeToFinish = t;
     this.t = 0;
 };
 
@@ -56,6 +61,7 @@ app.Particle.prototype.setNotMoving = function() {
     this.a0.y = 0;
     this.a0.z = 0;
 
+    this.timeToFinish = 0;
     this.t = 0;
 };
 
@@ -75,7 +81,18 @@ app.Particle.prototype.updatePosition = function() {
     this.position.z = (1/2)*this.a0.z*this.t*this.t + this.v0.z*this.t + this.p0.z;
 };
 
+app.Particle.prototype.updateColor = function() {
+    if (this.timeToFinish == 0) {
+        return; 
+    }
+    var c = this.startColor.clone().lerp(this.endColor, this.t / this.timeToFinish);
+    this.color.r = c.r;
+    this.color.g = c.g;
+    this.color.b = c.b;
+};
+
 app.Particle.prototype.update = function(dt) {
     this.t += dt;
     this.updatePosition();
+    this.updateColor();
 };

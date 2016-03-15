@@ -1,7 +1,6 @@
 var app = app || { };
 
 var scene, camera, renderer, lights = [], skull; 
-var particleStartingColor = new THREE.Color(0xffff00), particleEndingColor = new THREE.Color(0xffa500);
 var particles = [];
 var animation = new app.Animation1(particles);
 
@@ -30,7 +29,7 @@ var initSkull = function() {
         vector3.applyMatrix4(initialParticleModelMat);
 
         skullPointsGeometry.vertices.push(vector3.clone());
-        skullPointsGeometry.colors[i] = particleStartingColor.clone();
+        skullPointsGeometry.colors[i] = new THREE.Color(0xffff00);
 
         particles[i] = new app.Particle(skullPointsGeometry.vertices[i], skullPointsGeometry.colors[i]);
     }
