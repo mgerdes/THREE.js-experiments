@@ -2,7 +2,7 @@ var app = app || { };
 
 var scene, camera, renderer, lights = [], skull; 
 var particles = [];
-var animation = new app.Animation1(particles);
+var animation = new app.Animation2(particles);
 
 var initRenderer = function() {
     renderer = new THREE.WebGLRenderer({alpha: true});
