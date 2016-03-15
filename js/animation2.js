@@ -45,18 +45,18 @@ app.Animation2.prototype.update = function(dt) {
             if (distanceToEye1 < distanceToEye2) {
                 particle.state = this.States.SPLITTING_IN_HALF;
                 var nextPosition = new THREE.Vector3()
-                    .addVectors(particle.positionInSkull, new THREE.Vector3(3, -1, 0))
-                    .multiplyScalar(1/4);
-                particle.setToMoveWithAcceleration(new THREE.Vector3(-1, 1, 0), nextPosition, this.timeToSplitInHalf);
+                    .addVectors(particle.positionInSkull, new THREE.Vector3(2, -1, 0))
+                    .multiplyScalar(3/4);
+                particle.setToMoveWithAcceleration(new THREE.Vector3(1, 1, 0), nextPosition, this.timeToSplitInHalf);
                 particle.startColor = new THREE.Color(0xffff00);
                 particle.endColor = new THREE.Color(0xffa500);
             } 
             else {
                 particle.state = this.States.SPLITTING_IN_HALF;
                 var nextPosition = new THREE.Vector3()
-                    .addVectors(particle.positionInSkull, new THREE.Vector3(-3, -1, 0))
-                    .multiplyScalar(1/4);
-                particle.setToMoveWithAcceleration(new THREE.Vector3(1, 1, 0), nextPosition, this.timeToSplitInHalf);
+                    .addVectors(particle.positionInSkull, new THREE.Vector3(-2, -1, 0))
+                    .multiplyScalar(3/4);
+                particle.setToMoveWithAcceleration(new THREE.Vector3(-1, 1, 0), nextPosition, this.timeToSplitInHalf);
                 particle.startColor = new THREE.Color(0xffff00);
                 particle.endColor = new THREE.Color(0xffa500);
             }
@@ -65,6 +65,7 @@ app.Animation2.prototype.update = function(dt) {
             if (particle.t > this.timeToSplitInHalf) {
                 particle.state = this.States.MOVING_TO_BUNCH;
                 particle.setToMoveWithVelocity(particle.getCurrentVelocity(), this.positionToBunchAt, this.timeToMoveToBunch);
+                //particle.setToMoveWithAcceleration(new THREE.Vector3(1, 1, 0), this.positionToBunchAt, this.timeToMoveToBunch);
                 particle.startColor = new THREE.Color(0xffa500);
                 particle.endColor = new THREE.Color(0xff0000);
             }
