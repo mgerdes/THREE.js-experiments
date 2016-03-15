@@ -8,7 +8,7 @@ app.Particle = function(position, color) {
     this.v0 = new THREE.Vector3(0, 0, 0);
     this.p0 = position.clone();
     this.t = 0;
-    this.state = States.ORIGINAL_POSITION;
+    this.state = 0;
 };
 
 app.Particle.prototype.setToMoveWithAcceleration = function(a, p, t) {
@@ -78,50 +78,4 @@ app.Particle.prototype.updatePosition = function() {
 app.Particle.prototype.update = function(dt) {
     this.t += dt;
     this.updatePosition();
-
-    if (this.state == States.ORIGINAL_POSITION) {
-        var distanceToEye1 = this.positionInSkull.distanceTo(positionOfEye1);
-        var distanceToEye2 = this.positionInSkull.distanceTo(positionOfEye2);
-        var positionOfCloserEye, distanceToCloserEye;
-
-        if (distanceToEye1 < distanceToEye2) {
-            distanceToCloserEye = distanceToEye1;
-            positionOfCloserEye = positionOfEye1;
-        } else {
-            distanceToCloserEye = distanceToEye2;
-            positionOfCloserEye = positionOfEye2;
-        }
-
-        if (distanceToCloserEye > distanceBeingMoved) {
-            this.state = States.MOVING_TO_EYE;
-            this.setToMoveWithAcceleration(new THREE.Vector3(0, 0, 1), positionOfCloserEye, timeToMoveThroughEye);
-        }
-    } 
-    else if (this.state == States.MOVING_TO_EYE) {
-        if (this.t > timeToMoveThroughEye) {
-            this.state = States.MOVING_TO_BUNCH;
-            this.setToMoveWithVelocity(this.getCurrentVelocity(), positionToBunchAt, timeToMoveToBunch);
-        }
-    } 
-    else if (this.state == States.MOVING_TO_BUNCH) {
-        if (this.t > timeToMoveToBunch - 0.01) {
-            this.state = States.WAITING_AT_BUNCH;
-            this.setNotMoving();
-        }
-    } 
-    else if (this.state == States.WAITING_AT_BUNCH) {
-        if (isAllBunched) {
-            this.state = States.MOVING_BACK_TO_ORIGINAL_POSITION;
-            var randomVelocity = new THREE.Vector3(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 5);
-            this.setToMoveWithVelocity(randomVelocity, this.positionInSkull, timeToMoveBackToOriginalPosition);
-        }
-    } 
-    else if (this.state == States.MOVING_BACK_TO_ORIGINAL_POSITION) {
-        if (this.t > timeToMoveBackToOriginalPosition) {
-            this.state = States.ORIGINAL_POSITION;
-            distanceBeingMoved = 3;
-            this.resetPosition();
-            this.setNotMoving();  
-        }
-    }
 };
