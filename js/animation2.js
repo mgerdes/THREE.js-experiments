@@ -10,7 +10,7 @@ app.Animation2.prototype.States = {
     MOVING_TO_BUNCH: 2, 
     WAITING_AT_BUNCH: 3,
     MOVING_BACK_TO_ORIGINAL_POSITION: 4,
-    DO_NOTHING: 5
+    FINISHED: 5
 };
 
 app.Animation2.prototype.positionOfEye1 = new THREE.Vector3(0.5, 0.4, 0.5);
@@ -81,7 +81,7 @@ app.Animation2.prototype.update = function(dt) {
         }
         else if (particle.state == this.States.MOVING_BACK_TO_ORIGINAL_POSITION) {
             if (particle.t > this.timeToMoveBackToOriginalPosition) {
-                particle.state = this.States.ORIGINAL_POSITION;
+                particle.state = this.States.FINISHED;
                 particle.resetPosition();
                 particle.setNotMoving();  
                 particle.startColor = new THREE.Color(0xffff00);

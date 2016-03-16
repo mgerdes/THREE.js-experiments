@@ -2,6 +2,14 @@ var app = app || { };
 
 app.Animation1 = function(particles) {
     this.particles = particles;
+    this.distanceBeingMoved = 3;
+    this.isFinished = false;
+
+    for (var i = 0; i < particles.length; i++) {
+        particles[i].state = this.States.ORIGINAL_POSITION;
+        particles[i].resetPosition();
+        particles[i].setNotMoving();
+    }
 };
 
 app.Animation1.prototype.States = {
@@ -10,7 +18,7 @@ app.Animation1.prototype.States = {
     MOVING_TO_BUNCH: 2, 
     WAITING_AT_BUNCH: 3,
     MOVING_BACK_TO_ORIGINAL_POSITION: 4,
-    DO_NOTHING: 5
+    FINISHED: 5
 };
 
 app.Animation1.prototype.positionOfEye1 = new THREE.Vector3(0.5, 0.4, 0.5);
@@ -19,7 +27,6 @@ app.Animation1.prototype.positionToBunchAt = new THREE.Vector3(0, 0.5, 2.0);
 app.Animation1.prototype.timeToMoveThroughEye = 1;
 app.Animation1.prototype.timeToMoveToBunch = 0.5;
 app.Animation1.prototype.timeToMoveBackToOriginalPosition = 8;
-app.Animation1.prototype.distanceBeingMoved = 3;
 
 app.Animation1.prototype.isEveryParticleBunched = function() {
     for (var i = 0; i < this.particles.length; i++) {
@@ -86,8 +93,8 @@ app.Animation1.prototype.update = function(dt) {
         } 
         else if (particle.state == this.States.MOVING_BACK_TO_ORIGINAL_POSITION) {
             if (particle.t > this.timeToMoveBackToOriginalPosition) {
-                particle.state = this.States.ORIGINAL_POSITION;
-                this.distanceBeingMoved = 3;
+                this.isFinished = true;
+                particle.state = this.States.FINISHED;
                 particle.resetPosition();
                 particle.setNotMoving();  
                 particle.startColor = new THREE.Color(0xffff00);

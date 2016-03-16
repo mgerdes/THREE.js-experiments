@@ -2,7 +2,7 @@ var app = app || { };
 
 var scene, camera, renderer, lights = [], skull; 
 var particles = [];
-var animation = new app.Animation3(particles);
+var animationRunner = new app.AnimationRunner(particles);
 
 var initRenderer = function() {
     renderer = new THREE.WebGLRenderer({alpha: true});
@@ -31,7 +31,7 @@ var initSkull = function() {
         skullPointsGeometry.vertices.push(vector3.clone());
         skullPointsGeometry.colors[i] = new THREE.Color(0xffff00);
 
-        particles[i] = new app.Particle(skullPointsGeometry.vertices[i], skullPointsGeometry.colors[i]);
+        particles[i] = new app.Particle(skullPointsGeometry.vertices[i], skullPointsGeometry.colors[i], i);
     }
 
     skull = new THREE.Points(skullPointsGeometry, new THREE.PointsMaterial({size: 0.015, vertexColors: true}));
@@ -66,7 +66,7 @@ var init = function() {
 };
 
 var updateSkull = function(dt) {
-    animation.update(dt);
+    animationRunner.update(dt);
 
     skull.geometry.colorsNeedUpdate = true;
     skull.geometry.verticesNeedUpdate = true;

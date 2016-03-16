@@ -2,6 +2,8 @@ var app = app || { };
 
 app.Animation3 = function(particles) {
     this.particles = particles;
+    this.resetDistanceBeingMoved = false;
+    this.distanceBeingMoved = 0;
 };
 
 app.Animation3.prototype.States = {
@@ -9,12 +11,10 @@ app.Animation3.prototype.States = {
     MOVING_TO_PROJECTION: 1,
     WAITING_IN_PROJECTED_POSITION: 2,
     MOVING_BACK_TO_ORIGINAL_POSITION: 3,
-    DO_NOTHING: 4
+    FINISHED: 4
 };
 
 app.Animation3.prototype.timeToMoveToProjection = 3;
-app.Animation3.prototype.distanceBeingMoved = 0;
-app.Animation3.prototype.resetDistanceBeingMoved = false;
 
 app.Animation3.prototype.isAllInProjectedPosition = function() {
     for (var i = 0; i < this.particles.length; i++) {
@@ -37,7 +37,7 @@ app.Animation3.prototype.update = function(dt) {
         particle.update(dt);
 
         if (particle.state == this.States.ORIGINAL_POSITION) {
-            var distance = particle.position.distanceTo(new THREE.Vector3(0, 0, 1));
+            var distance = particle.position.distanceTo(new THREE.Vector3(0, 0, 0.5));
             if (distance < this.distanceBeingMoved) {
                 particle.state = this.States.MOVING_TO_PROJECTION;
                 var projectionPosition = new THREE.Vector3(particle.positionInSkull.x, particle.positionInSkull.y, -particle.positionInSkull.z);
@@ -63,7 +63,7 @@ app.Animation3.prototype.update = function(dt) {
                 }
             }
             if (this.resetDistanceBeingMoved) {
-                var distance = particle.position.distanceTo(new THREE.Vector3(0, 0, -1));
+                var distance = particle.position.distanceTo(new THREE.Vector3(0, 0, -0.5));
                 if (distance < this.distanceBeingMoved) { 
                     particle.state = this.States.MOVING_BACK_TO_ORIGINAL_POSITION;
                     var originalPosition = particle.positionInSkull;
@@ -75,7 +75,7 @@ app.Animation3.prototype.update = function(dt) {
         }
         else if (particle.state == this.States.MOVING_BACK_TO_ORIGINAL_POSITION) {
             if (particle.t > this.timeToMoveToProjection) {
-                particle.state = this.States.DO_NOTHING;
+                particle.state = this.States.FINISHED;
                 particle.setNotMoving();
             }
         }

@@ -1,8 +1,9 @@
 var app = app || { };
 
-app.Particle = function(position, color) {
+app.Particle = function(position, color, i) {
     this.position = position;
     this.color = color;
+    this.i = i;
     this.startColor = color.clone();
     this.endColor = color.clone();
     this.positionInSkull = position.clone();
