@@ -1,7 +1,7 @@
 var app = app || { }
 
 app.init = function() {
-    app.renderer = new THREE.WebGLRenderer();
+    app.renderer = new THREE.WebGLRenderer({alpha: true});
     app.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(app.renderer.domElement);
 
@@ -9,7 +9,7 @@ app.init = function() {
 
     var width = window.innerWidth;
     var height = window.innerHeight;
-    app.camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 0, 1);
+    app.camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 0, 1);
 
     app.scene = new THREE.Scene();
 
@@ -20,6 +20,7 @@ app.init = function() {
 
     var addKeyButton = document.getElementById('add-key-button');
     var keyInput = document.getElementById('key-input');
+	app.animationSlider = document.getElementById('animation-slider');
 
     addKeyButton.addEventListener("click", function() { 
         app.tree.insert(keyInput.value);
@@ -29,6 +30,12 @@ app.init = function() {
 };
 
 app.render = function() {
+	if (app.tree.currentTime > app.tree.ANIMATION_TIME) {
+		app.tree.updateHelper(app.tree.root, app.animationSlider.value / 100);
+	} 
+	else {
+		app.animationSlider.value = 100 * app.tree.currentTime / app.tree.ANIMATION_TIME;
+	}
     requestAnimationFrame(app.render);
     app.tree.update(1/60);
     app.renderer.render(app.scene, app.camera);

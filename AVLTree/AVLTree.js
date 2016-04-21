@@ -33,11 +33,8 @@ app.AVLTree.prototype.setAfterFixPositions = function(node, depth, leftPos) {
 
 app.AVLTree.prototype.update = function(dt) {
     if (!this.isAnimating) {
-        this.currentTime = 0;
         return;
     }
-
-    //console.log("ANIMATING");
 
     if (this.currentTime > this.ANIMATION_TIME) {
         this.isAnimating = false;
@@ -61,6 +58,8 @@ app.AVLTree.prototype.updateHelper = function(node, alpha) {
 };
 
 app.AVLTree.prototype.insert = function(key) {
+	this.currentTime = 0;
+	
     if (this.isAnimating) {
         return;
     }
@@ -161,8 +160,8 @@ app.AVLTree.prototype.fixTree = function(node) {
 };
     
 app.AVLTree.prototype.rightRotate = function(x) {
-    y = x.leftChild;
-    z = y.rightChild;
+    var y = x.leftChild;
+    var z = y.rightChild;
 
     y.parent = x.parent; 
     if (x.parent) {

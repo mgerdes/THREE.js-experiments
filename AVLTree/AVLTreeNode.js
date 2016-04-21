@@ -37,6 +37,9 @@ app.AVLTreeNode = function(key) {
 
     this.beforeFixPosition = new THREE.Vector3();
     this.afterFixPosition = new THREE.Vector3();
+	
+	this.beforeFixLeftChild = null;
+	this.beforeFixRightChild = null;
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
@@ -51,6 +54,9 @@ app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth,
     this.beforeFixPosition.x = this.node.position.x;
     this.beforeFixPosition.y = this.node.position.y;
     this.beforeFixPosition.z = this.node.position.z;
+	
+	this.beforeFixLeftChild = this.leftChild;
+	this.beforeFixRightChild = this.rightChild;
 };
 
 app.AVLTreeNode.prototype.setAfterFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
@@ -96,23 +102,48 @@ app.AVLTreeNode.prototype.getBalanceFactor = function() {
 
 app.AVLTreeNode.prototype.update = function(alpha) {
     this.node.position.lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
+	
+	if (alpha >= 0.05 || alpha <= 0.95) {
+		this.leftLine.visible = false;
+		this.rightLine.visible = false;
+	}
 
-    if (this.leftChild) {
-        this.leftLine.visible = true;
-        this.leftLine.geometry.vertices = [this.object.children[0].position, this.leftChild.object.children[0].position];
-        this.leftLine.geometry.verticesNeedUpdate = true;
-    }
-    else {
-        this.leftLine.visible = false;
-    }
-    if (this.rightChild) {
-        this.rightLine.visible = true;
-        this.rightLine.geometry.vertices = [this.object.children[0].position, this.rightChild.object.children[0].position];
-        this.rightLine.geometry.verticesNeedUpdate = true;
-    }
-    else {
-        this.rightLine.visible = false;
-    }
+	if (alpha < 0.05) {
+		if (this.beforeFixLeftChild) {
+			this.leftLine.visible = true;
+			this.leftLine.geometry.vertices = [this.node.position, this.beforeFixLeftChild.node.position];
+			this.leftLine.geometry.verticesNeedUpdate = true;
+		} 
+		else {
+			this.leftLine.visible = false;
+		}
+		if (this.beforeFixRightChild) {
+			this.rightLine.visible = true;
+			this.rightLine.geometry.vertices = [this.node.position, this.beforeFixRightChild.node.position];
+			this.rightLine.geometry.verticesNeedUpdate = true;
+		}
+		else {
+			this.rightLine.visible = false;
+		}
+	}
+	if (alpha > 0.95) {
+		if (this.leftChild) {
+			this.leftLine.visible = true;
+			this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
+			this.leftLine.geometry.verticesNeedUpdate = true;
+		} 
+		else {
+			this.leftLine.visible = false;
+		}
+		if (this.rightChild) {
+			this.rightLine.visible = true;
+			this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
+			this.rightLine.geometry.verticesNeedUpdate = true;
+		}
+		else {
+			this.rightLine.visible = false;
+		}
+	}
 
     var screenPosition = new THREE.Vector3();
     screenPosition.set(this.node.position.x - this.width / 2, this.node.position.y + 200 + this.width / 2, 0.0);
