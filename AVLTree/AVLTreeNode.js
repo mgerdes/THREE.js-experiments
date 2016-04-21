@@ -34,9 +34,40 @@ app.AVLTreeNode = function(key) {
     this.textDiv.style.lineHeight = (this.width - 10) + 'px';
     this.textDiv.innerHTML = this.key;
     document.body.appendChild(this.textDiv);
+
+    this.beforeFixPosition = new THREE.Vector3();
+    this.afterFixPosition = new THREE.Vector3();
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
+
+app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
+    var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
+
+    this.beforeFixPosition.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
+    this.beforeFixPosition.y = -nodeDepth * this.width;
+    this.beforeFixPosition.z = 0;
+
+    console.log("set before fix position: ");
+    console.log(this.key);
+    console.log(this.beforeFixPosition);
+};
+
+app.AVLTreeNode.prototype.setAfterFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
+    var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
+
+    console.log(treeHeight);
+    console.log(nodeDepth);
+    console.log(nodeLeftPos);
+
+    this.afterFixPosition.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
+    this.afterFixPosition.y = -nodeDepth * this.width;
+    this.afterFixPosition.z = 0;
+
+    console.log("set after fix position: ");
+    console.log(this.key);
+    console.log(this.afterFixPosition);
+};
 
 app.AVLTreeNode.prototype.recalculateHeight = function() {
     var leftHeight = 0;
@@ -76,6 +107,11 @@ app.AVLTreeNode.prototype.updateObject = function(treeHeight, nodeDepth, nodeLef
 
     this.node.position.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
     this.node.position.y = -nodeDepth * this.width;
+    this.node.position.z = 0;
+
+    console.log("set position: ");
+    console.log(this.key);
+    console.log(this.node.position);
 
     if (this.leftChild) {
         this.leftLine.visible = true;

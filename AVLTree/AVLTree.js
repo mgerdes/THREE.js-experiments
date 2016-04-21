@@ -5,6 +5,28 @@ app.AVLTree = function() {
     this.object = new THREE.Object3D();
 };
 
+app.AVLTree.prototype.setBeforeFixPositions = function(node, depth, leftPos) {
+    if (!node) {
+        return;
+    }
+
+    node.setBeforeFixPosition(this.root.height, depth, leftPos);
+
+    this.setBeforeFixPositions(node.leftChild, depth + 1, leftPos * 2);
+    this.setBeforeFixPositions(node.rightChild, depth + 1, leftPos * 2 + 1);
+};
+
+app.AVLTree.prototype.setAfterFixPositions = function(node, depth, leftPos) {
+    if (!node) {
+        return;
+    }
+
+    node.setAfterFixPosition(this.root.height - 1, depth, leftPos);
+
+    this.setAfterFixPositions(node.leftChild, depth + 1, leftPos * 2);
+    this.setAfterFixPositions(node.rightChild, depth + 1, leftPos * 2 + 1);
+};
+
 app.AVLTree.prototype.updateNodePositions = function(node, depth, leftPos) {
     if (!node) {
         return;
@@ -35,8 +57,12 @@ app.AVLTree.prototype.insert = function(key) {
                 // Create new node and add it to the tree
                 currentNode.leftChild = new app.AVLTreeNode(key);
                 currentNode.leftChild.parent = currentNode;
+
                 this.object.add(currentNode.leftChild.object);
+
+                this.setBeforeFixPositions(this.root, 0, 0);
                 this.fixTree(currentNode.leftChild);
+                this.setAfterFixPositions(this.root, 0, 0);
                 break;
             }
             currentNode = currentNode.leftChild;
@@ -46,8 +72,12 @@ app.AVLTree.prototype.insert = function(key) {
                 // Create new node and add it to the tree
                 currentNode.rightChild = new app.AVLTreeNode(key);
                 currentNode.rightChild.parent = currentNode;
+
                 this.object.add(currentNode.rightChild.object);
+
+                this.setBeforeFixPositions(this.root, 0, 0);
                 this.fixTree(currentNode.rightChild);
+                this.setAfterFixPositions(this.root, 0, 0);
                 break;
             }
             currentNode = currentNode.rightChild;
