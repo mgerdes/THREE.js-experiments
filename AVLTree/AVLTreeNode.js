@@ -40,6 +40,8 @@ app.AVLTreeNode = function(key) {
 	
 	this.beforeFixLeftChild = null;
 	this.beforeFixRightChild = null;
+	
+	this.isBeingRotated = false;
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
@@ -103,9 +105,26 @@ app.AVLTreeNode.prototype.getBalanceFactor = function() {
 app.AVLTreeNode.prototype.update = function(alpha) {
     this.node.position.lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
 	
-	if (alpha >= 0.05 || alpha <= 0.95) {
-		this.leftLine.visible = false;
-		this.rightLine.visible = false;
+	if (alpha >= 0.05 && alpha <= 0.95) {
+		if (this.leftChild == this.beforeFixLeftChild && this.leftChild) {
+			this.leftLine.visible = true;
+			
+			this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
+			this.leftLine.geometry.verticesNeedUpdate = true;
+		}
+		else {
+			this.leftLine.visible = false;
+		}
+		if (this.rightChild == this.beforeFixRightChild && this.rightChild) {
+			this.rightLine.visible = true;
+			
+			this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
+			this.rightLine.geometry.verticesNeedUpdate = true;
+
+		}
+		else {
+			this.rightLine.visible = false;
+		}
 	}
 
 	if (alpha < 0.05) {
