@@ -58,11 +58,14 @@ app.AVLTree.prototype.updateHelper = function(node, alpha) {
 };
 
 app.AVLTree.prototype.insert = function(key) {
-	this.currentTime = 0;
-	
     if (this.isAnimating) {
         return;
     }
+	if (!key || key == "") {
+		return;
+	}
+	
+	this.currentTime = 0;
 
     if (this.root === null) {
         // Insert first node into the tree

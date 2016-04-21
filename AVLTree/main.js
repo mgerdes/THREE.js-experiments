@@ -23,9 +23,11 @@ app.init = function() {
 	app.animationSlider = document.getElementById('animation-slider');
 
     addKeyButton.addEventListener("click", function() { 
-        app.tree.insert(keyInput.value);
-        app.tree.isAnimating = true;
-        keyInput.value = '';
+		if (!app.tree.isAnimating) {
+			app.tree.insert(keyInput.value);
+			app.tree.isAnimating = true;
+			keyInput.value = '';
+		}
     });
 };
 
