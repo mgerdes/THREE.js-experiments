@@ -1,7 +1,7 @@
 var app = app || { }
 
 app.init = function() {
-    app.renderer = new THREE.WebGLRenderer({alpha: true});
+    app.renderer = new THREE.WebGLRenderer();
     app.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(app.renderer.domElement);
 
@@ -25,6 +25,7 @@ app.init = function() {
     addKeyButton.addEventListener("click", function() { 
         app.tree.insert(keyInput.value);
         app.tree.updateNodePositions(app.tree.root, 0, 0);
+        keyInput.value = '';
     });
 };
 
