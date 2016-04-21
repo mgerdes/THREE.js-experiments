@@ -48,25 +48,17 @@ app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth,
     this.beforeFixPosition.y = -nodeDepth * this.width;
     this.beforeFixPosition.z = 0;
 
-    console.log("set before fix position: ");
-    console.log(this.key);
-    console.log(this.beforeFixPosition);
+    this.beforeFixPosition.x = this.node.position.x;
+    this.beforeFixPosition.y = this.node.position.y;
+    this.beforeFixPosition.z = this.node.position.z;
 };
 
 app.AVLTreeNode.prototype.setAfterFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
     var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
 
-    console.log(treeHeight);
-    console.log(nodeDepth);
-    console.log(nodeLeftPos);
-
     this.afterFixPosition.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
     this.afterFixPosition.y = -nodeDepth * this.width;
     this.afterFixPosition.z = 0;
-
-    console.log("set after fix position: ");
-    console.log(this.key);
-    console.log(this.afterFixPosition);
 };
 
 app.AVLTreeNode.prototype.recalculateHeight = function() {
@@ -102,16 +94,8 @@ app.AVLTreeNode.prototype.getBalanceFactor = function() {
     return leftHeight - rightHeight;
 };
 
-app.AVLTreeNode.prototype.updateObject = function(treeHeight, nodeDepth, nodeLeftPos) {
-    var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
-
-    this.node.position.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
-    this.node.position.y = -nodeDepth * this.width;
-    this.node.position.z = 0;
-
-    console.log("set position: ");
-    console.log(this.key);
-    console.log(this.node.position);
+app.AVLTreeNode.prototype.update = function(alpha) {
+    this.node.position.lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
 
     if (this.leftChild) {
         this.leftLine.visible = true;
@@ -143,4 +127,3 @@ app.AVLTreeNode.prototype.updateObject = function(treeHeight, nodeDepth, nodeLef
     this.textDiv.style.top = (screenPosition.y + 5) + 'px';
     this.textDiv.style.left = (screenPosition.x + 5) + 'px';
 };
-

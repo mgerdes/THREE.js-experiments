@@ -3,7 +3,11 @@ var app = app || { };
 app.AVLTree = function() {
     this.root = null;
     this.object = new THREE.Object3D();
+    this.isAnimating = false;
+    this.currentTime = 0;
 };
+
+app.AVLTree.prototype.ANIMATION_TIME = 1.0; 
 
 app.AVLTree.prototype.setBeforeFixPositions = function(node, depth, leftPos) {
     if (!node) {
@@ -27,18 +31,40 @@ app.AVLTree.prototype.setAfterFixPositions = function(node, depth, leftPos) {
     this.setAfterFixPositions(node.rightChild, depth + 1, leftPos * 2 + 1);
 };
 
-app.AVLTree.prototype.updateNodePositions = function(node, depth, leftPos) {
+app.AVLTree.prototype.update = function(dt) {
+    if (!this.isAnimating) {
+        this.currentTime = 0;
+        return;
+    }
+
+    //console.log("ANIMATING");
+
+    if (this.currentTime > this.ANIMATION_TIME) {
+        this.isAnimating = false;
+        return;
+    }
+
+    this.currentTime += dt;
+
+    this.updateHelper(this.root, this.currentTime / this.ANIMATION_TIME);
+};
+
+app.AVLTree.prototype.updateHelper = function(node, alpha) {
     if (!node) {
         return;
     }
 
-    node.updateObject(this.root.height - 1, depth, leftPos);
+    node.update(alpha);
 
-    this.updateNodePositions(node.leftChild, depth + 1, leftPos * 2); 
-    this.updateNodePositions(node.rightChild, depth + 1, leftPos * 2 + 1); 
+    this.updateHelper(node.leftChild, alpha);
+    this.updateHelper(node.rightChild, alpha);
 };
 
 app.AVLTree.prototype.insert = function(key) {
+    if (this.isAnimating) {
+        return;
+    }
+
     if (this.root === null) {
         // Insert first node into the tree
         this.root = new app.AVLTreeNode(key);
@@ -47,16 +73,21 @@ app.AVLTree.prototype.insert = function(key) {
     }
 
     var currentNode = this.root;
-    var insertHeight = 0;
+    var insertDepth = 0;
+    var insertLeftPos = 0;
 
     while (true) {
-        insertHeight++;
+        insertDepth++;
 
         if (currentNode.key > key) {
+            insertLeftPos = insertLeftPos * 2;
             if (currentNode.leftChild === null) {
                 // Create new node and add it to the tree
                 currentNode.leftChild = new app.AVLTreeNode(key);
                 currentNode.leftChild.parent = currentNode;
+
+                currentNode.leftChild.node.position.x = currentNode.node.position.x - currentNode.width;
+                currentNode.leftChild.node.position.y = currentNode.node.position.y - currentNode.width;
 
                 this.object.add(currentNode.leftChild.object);
 
@@ -68,10 +99,14 @@ app.AVLTree.prototype.insert = function(key) {
             currentNode = currentNode.leftChild;
         }
         else {
+            insertLeftPos = insertLeftPos * 2 + 1;
             if (currentNode.rightChild === null) {
                 // Create new node and add it to the tree
                 currentNode.rightChild = new app.AVLTreeNode(key);
                 currentNode.rightChild.parent = currentNode;
+
+                currentNode.rightChild.node.position.x = currentNode.node.position.x + currentNode.width;
+                currentNode.rightChild.node.position.y = currentNode.node.position.y - currentNode.width;
 
                 this.object.add(currentNode.rightChild.object);
 

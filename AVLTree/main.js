@@ -14,7 +14,6 @@ app.init = function() {
     app.scene = new THREE.Scene();
 
     app.tree = new app.AVLTree();
-    app.tree.updateNodePositions(app.tree.root, 0, 0);
     app.tree.object.position.y = 200;
 
     app.scene.add(app.tree.object);
@@ -24,13 +23,14 @@ app.init = function() {
 
     addKeyButton.addEventListener("click", function() { 
         app.tree.insert(keyInput.value);
-        app.tree.updateNodePositions(app.tree.root, 0, 0);
+        app.tree.isAnimating = true;
         keyInput.value = '';
     });
 };
 
 app.render = function() {
     requestAnimationFrame(app.render);
+    app.tree.update(1/60);
     app.renderer.render(app.scene, app.camera);
 };
 
