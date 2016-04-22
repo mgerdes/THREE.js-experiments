@@ -10,6 +10,8 @@ app.AVLTreeNode = function(key) {
     this.width = 70;
 
     this.node = new THREE.Mesh(this.circleGeometry, new THREE.MeshBasicMaterial({color: 0xffffff}));
+    this.nodeEdges = new THREE.Mesh(this.circleEdgeGeometry, new THREE.MeshBasicMaterial({color: 0x888888}));
+    this.nodeEdges.position = this.node.position; 
 
     this.leftLine = new THREE.Line(new THREE.Geometry(), new THREE.LineBasicMaterial({color: 0xffffff}));
     this.rightLine = new THREE.Line(new THREE.Geometry(), new THREE.LineBasicMaterial({color: 0xffffff}));
@@ -22,6 +24,7 @@ app.AVLTreeNode = function(key) {
 
     this.object = new THREE.Object3D();
     this.object.add(this.node);
+    this.object.add(this.nodeEdges);
     this.object.add(this.leftLine);
     this.object.add(this.rightLine);
 
@@ -55,6 +58,7 @@ app.AVLTreeNode = function(key) {
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
+app.AVLTreeNode.prototype.circleEdgeGeometry = new THREE.CircleGeometry(34, 32);
 
 app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
     var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
@@ -113,7 +117,10 @@ app.AVLTreeNode.prototype.getBalanceFactor = function() {
 };
 
 app.AVLTreeNode.prototype.update = function(alpha) {
-    this.node.position.lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
+    var newPosition = new THREE.Vector3().lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
+    this.node.position.set(newPosition.x, newPosition.y, newPosition.z);
+    this.nodeEdges.position.set(newPosition.x, newPosition.y, newPosition.z);
+    this.nodeEdges.position.z = -0.5;
 	
 	if (alpha >= 0.05 && alpha <= 0.95) {
 		if (this.leftChild == this.beforeFixLeftChild && this.leftChild) {
