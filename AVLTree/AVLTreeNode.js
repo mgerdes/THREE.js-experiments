@@ -25,10 +25,20 @@ app.AVLTreeNode = function(key) {
     this.object.add(this.leftLine);
     this.object.add(this.rightLine);
 
+    var keyLen = this.key.length;  
+    var fontSize = 40;
+    if (keyLen == 2) {
+        fontSize = 30;
+    }
+    if (keyLen > 2) {
+        fontSize = 30 / (keyLen - 1) + 5; 
+    }
+
     this.textDiv = document.createElement('div');
     this.textDiv.style.textAlign = "center";
     this.textDiv.style.color = "black";
     this.textDiv.style.position = 'absolute';
+    this.textDiv.style.fontSize = fontSize + 'px';
     this.textDiv.style.width = (this.width - 10) + 'px';
     this.textDiv.style.height = (this.width - 10) + 'px';
     this.textDiv.style.lineHeight = (this.width - 10) + 'px';
