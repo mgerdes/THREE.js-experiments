@@ -38,6 +38,7 @@ app.AVLTree.prototype.update = function(dt) {
 
     if (this.currentTime > this.ANIMATION_TIME) {
         this.isAnimating = false;
+        this.updateHelper(this.root, 1.0);
         return;
     }
 
@@ -64,6 +65,8 @@ app.AVLTree.prototype.insert = function(key) {
 	if (!key || key == "") {
 		return;
 	}
+
+    this.updateHelper(this.root, 1.0);
 	
 	this.currentTime = 0;
 
