@@ -48,13 +48,31 @@ app.AVLTreeNode = function(key) {
     this.textDiv.innerHTML = this.key;
     document.body.appendChild(this.textDiv);
 
+    this.balanceFactorDiv = document.createElement('div');
+    this.balanceFactorDiv.style.textAlign = 'center';
+    this.balanceFactorDiv.style.color = 'white';
+    this.balanceFactorDiv.style.backgroundColor = 'black';
+    this.balanceFactorDiv.style.borderColor = 'red';
+    this.balanceFactorDiv.style.borderStyle = 'solid';
+    this.balanceFactorDiv.style.borderWidth = '1px';
+    this.balanceFactorDiv.style.lineHeight = '17px';
+    this.balanceFactorDiv.style.width = '17px';
+    this.balanceFactorDiv.style.height = '17px';
+    this.balanceFactorDiv.style.position = 'absolute';
+    this.balanceFactorDiv.style.top = '-12px';
+    this.balanceFactorDiv.style.left = '20px';
+    this.balanceFactorDiv.style.fontSize = '10px';
+    this.balanceFactorDiv.innerHTML = '0';
+    this.textDiv.appendChild(this.balanceFactorDiv);
+
     this.beforeFixPosition = new THREE.Vector3();
     this.afterFixPosition = new THREE.Vector3();
 	
 	this.beforeFixLeftChild = null;
 	this.beforeFixRightChild = null;
-	
-	this.isBeingRotated = false;
+
+    this.beforeFixBalanceFactor = 0;
+    this.afterFixBalanceFactor = 0;
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
@@ -73,6 +91,8 @@ app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth,
 	
 	this.beforeFixLeftChild = this.leftChild;
 	this.beforeFixRightChild = this.rightChild;
+
+    this.beforeFixBalanceFactor = this.getBalanceFactor();
 };
 
 app.AVLTreeNode.prototype.setAfterFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
@@ -81,6 +101,8 @@ app.AVLTreeNode.prototype.setAfterFixPosition = function(treeHeight, nodeDepth, 
     this.afterFixPosition.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
     this.afterFixPosition.y = -nodeDepth * this.width;
     this.afterFixPosition.z = 0;
+
+    this.afterFixBalanceFactor = this.getBalanceFactor();
 };
 
 app.AVLTreeNode.prototype.recalculateHeight = function() {
@@ -193,4 +215,10 @@ app.AVLTreeNode.prototype.update = function(alpha) {
 
     this.textDiv.style.top = (screenPosition.y + 5) + 'px';
     this.textDiv.style.left = (screenPosition.x + 5) + 'px';
+
+    var bf = this.afterFixBalanceFactor;
+    if (bf > 0) {
+        bf = '+' + bf;
+    }
+    this.balanceFactorDiv.innerHTML = bf;
 };
