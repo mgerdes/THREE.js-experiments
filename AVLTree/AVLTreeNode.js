@@ -67,18 +67,25 @@ app.AVLTreeNode = function(key) {
 
     this.beforeFixPosition = new THREE.Vector3();
     this.afterFixPosition = new THREE.Vector3();
-	
-	this.beforeFixLeftChild = null;
-	this.beforeFixRightChild = null;
+    
+    this.beforeFixLeftChild = null;
+    this.beforeFixRightChild = null;
 
     this.beforeFixBalanceFactor = 0;
     this.afterFixBalanceFactor = 0;
+
+    this.insertPositions = null;
 };
 
 app.AVLTreeNode.prototype.circleGeometry = new THREE.CircleGeometry(30, 32);
 app.AVLTreeNode.prototype.circleEdgeGeometry = new THREE.CircleGeometry(34, 32);
 
 app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth, nodeLeftPos) {
+    if (this.insertPositions) {
+        this.beforeFixPosition = this.insertPositions[this.insertPositions.length - 1];
+        return;
+    }
+
     var numberOfNodesAtDepth = Math.pow(2, nodeDepth);
 
     this.beforeFixPosition.x = (nodeLeftPos - (numberOfNodesAtDepth - 1) / 2) * (this.width * Math.pow(2, treeHeight - nodeDepth));
@@ -88,9 +95,9 @@ app.AVLTreeNode.prototype.setBeforeFixPosition = function(treeHeight, nodeDepth,
     this.beforeFixPosition.x = this.node.position.x;
     this.beforeFixPosition.y = this.node.position.y;
     this.beforeFixPosition.z = this.node.position.z;
-	
-	this.beforeFixLeftChild = this.leftChild;
-	this.beforeFixRightChild = this.rightChild;
+    
+    this.beforeFixLeftChild = this.leftChild;
+    this.beforeFixRightChild = this.rightChild;
 
     this.beforeFixBalanceFactor = this.getBalanceFactor();
 };
@@ -139,70 +146,6 @@ app.AVLTreeNode.prototype.getBalanceFactor = function() {
 };
 
 app.AVLTreeNode.prototype.update = function(alpha) {
-    var newPosition = new THREE.Vector3().lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
-    this.node.position.set(newPosition.x, newPosition.y, newPosition.z);
-    this.nodeEdges.position.set(newPosition.x, newPosition.y, newPosition.z);
-    this.nodeEdges.position.z = -0.5;
-	
-	if (alpha >= 0.05 && alpha <= 0.95) {
-		if (this.leftChild == this.beforeFixLeftChild && this.leftChild) {
-			this.leftLine.visible = true;
-			
-			this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
-			this.leftLine.geometry.verticesNeedUpdate = true;
-		}
-		else {
-			this.leftLine.visible = false;
-		}
-		if (this.rightChild == this.beforeFixRightChild && this.rightChild) {
-			this.rightLine.visible = true;
-			
-			this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
-			this.rightLine.geometry.verticesNeedUpdate = true;
-
-		}
-		else {
-			this.rightLine.visible = false;
-		}
-	}
-
-	if (alpha < 0.05) {
-		if (this.beforeFixLeftChild) {
-			this.leftLine.visible = true;
-			this.leftLine.geometry.vertices = [this.node.position, this.beforeFixLeftChild.node.position];
-			this.leftLine.geometry.verticesNeedUpdate = true;
-		} 
-		else {
-			this.leftLine.visible = false;
-		}
-		if (this.beforeFixRightChild) {
-			this.rightLine.visible = true;
-			this.rightLine.geometry.vertices = [this.node.position, this.beforeFixRightChild.node.position];
-			this.rightLine.geometry.verticesNeedUpdate = true;
-		}
-		else {
-			this.rightLine.visible = false;
-		}
-	}
-	if (alpha > 0.95) {
-		if (this.leftChild) {
-			this.leftLine.visible = true;
-			this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
-			this.leftLine.geometry.verticesNeedUpdate = true;
-		} 
-		else {
-			this.leftLine.visible = false;
-		}
-		if (this.rightChild) {
-			this.rightLine.visible = true;
-			this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
-			this.rightLine.geometry.verticesNeedUpdate = true;
-		}
-		else {
-			this.rightLine.visible = false;
-		}
-	}
-
     var screenPosition = new THREE.Vector3();
     screenPosition.set(this.node.position.x - this.width / 2, this.node.position.y + 200 + this.width / 2, 0.0);
 
@@ -216,9 +159,97 @@ app.AVLTreeNode.prototype.update = function(alpha) {
     this.textDiv.style.top = (screenPosition.y + 5) + 'px';
     this.textDiv.style.left = (screenPosition.x + 5) + 'px';
 
-    var bf = this.afterFixBalanceFactor;
-    if (bf > 0) {
-        bf = '+' + bf;
+    if (alpha < 0.5) {
+        if (!this.insertPositions) {
+            return;
+        }
+
+        alpha *= 2;
+
+        var transitionTime = 1.0 / (this.insertPositions.length - 1);
+        var currentTransition = Math.floor(alpha / transitionTime);
+
+        var transitionStartPosition = this.insertPositions[currentTransition];
+        var transitionEndPosition = this.insertPositions[currentTransition + 1];
+
+        var newPosition = new THREE.Vector3().lerpVectors(transitionStartPosition, transitionEndPosition, (alpha % transitionTime) / transitionTime);
+        this.node.position.set(newPosition.x, newPosition.y, newPosition.z);
+        this.nodeEdges.position.set(newPosition.x, newPosition.y, newPosition.z);
+        this.nodeEdges.position.z = -0.5;
+    } 
+    else {
+        var bf = this.afterFixBalanceFactor;
+        if (bf > 0) {
+            bf = '+' + bf;
+        }
+        this.balanceFactorDiv.innerHTML = bf;
+
+        alpha -= 0.5;
+        alpha *= 2;
+
+        var newPosition = new THREE.Vector3().lerpVectors(this.beforeFixPosition, this.afterFixPosition, alpha);
+        this.node.position.set(newPosition.x, newPosition.y, newPosition.z);
+        this.nodeEdges.position.set(newPosition.x, newPosition.y, newPosition.z);
+        this.nodeEdges.position.z = -0.5;
+
+        if (alpha >= 0.05 && alpha <= 0.95) {
+            if (this.leftChild == this.beforeFixLeftChild && this.leftChild) {
+                this.leftLine.visible = true;
+
+                this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
+                this.leftLine.geometry.verticesNeedUpdate = true;
+            }
+            else {
+                this.leftLine.visible = false;
+            }
+            if (this.rightChild == this.beforeFixRightChild && this.rightChild) {
+                this.rightLine.visible = true;
+
+                this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
+                this.rightLine.geometry.verticesNeedUpdate = true;
+
+            }
+            else {
+                this.rightLine.visible = false;
+            }
+        }
+
+        if (alpha < 0.05) {
+            if (this.beforeFixLeftChild) {
+                this.leftLine.visible = true;
+                this.leftLine.geometry.vertices = [this.node.position, this.beforeFixLeftChild.node.position];
+                this.leftLine.geometry.verticesNeedUpdate = true;
+            } 
+            else {
+                this.leftLine.visible = false;
+            }
+            if (this.beforeFixRightChild) {
+                this.rightLine.visible = true;
+                this.rightLine.geometry.vertices = [this.node.position, this.beforeFixRightChild.node.position];
+                this.rightLine.geometry.verticesNeedUpdate = true;
+            }
+            else {
+                this.rightLine.visible = false;
+            }
+        }
+        if (alpha > 0.95) {
+            if (this.leftChild) {
+                this.leftLine.visible = true;
+                this.leftLine.geometry.vertices = [this.node.position, this.leftChild.node.position];
+                this.leftLine.geometry.verticesNeedUpdate = true;
+            } 
+            else {
+                this.leftLine.visible = false;
+            }
+            if (this.rightChild) {
+                this.rightLine.visible = true;
+                this.rightLine.geometry.vertices = [this.node.position, this.rightChild.node.position];
+                this.rightLine.geometry.verticesNeedUpdate = true;
+            }
+            else {
+                this.rightLine.visible = false;
+            }
+        }
+
     }
-    this.balanceFactorDiv.innerHTML = bf;
 };

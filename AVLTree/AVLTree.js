@@ -7,7 +7,8 @@ app.AVLTree = function() {
     this.currentTime = 0;
 };
 
-app.AVLTree.prototype.ANIMATION_TIME = 1.0; 
+app.AVLTree.prototype.ROTATE_ANIMATION_TIME = 1.0; 
+app.AVLTree.prototype.INSERT_ANIMATION_TIME = 1.0;
 
 app.AVLTree.prototype.setBeforeFixPositions = function(node, depth, leftPos) {
     if (!node) {
@@ -36,7 +37,7 @@ app.AVLTree.prototype.update = function(dt) {
         return;
     }
 
-    if (this.currentTime > this.ANIMATION_TIME) {
+    if (this.currentTime > this.ROTATE_ANIMATION_TIME + this.INSERT_ANIMATION_TIME) {
         this.isAnimating = false;
         this.updateHelper(this.root, 1.0);
         return;
@@ -44,7 +45,7 @@ app.AVLTree.prototype.update = function(dt) {
 
     this.currentTime += dt;
 
-    this.updateHelper(this.root, this.currentTime / this.ANIMATION_TIME);
+    this.updateHelper(this.root, this.currentTime / (this.ROTATE_ANIMATION_TIME + this.INSERT_ANIMATION_TIME));
 };
 
 app.AVLTree.prototype.updateHelper = function(node, alpha) {
@@ -58,17 +59,29 @@ app.AVLTree.prototype.updateHelper = function(node, alpha) {
     this.updateHelper(node.rightChild, alpha);
 };
 
+app.AVLTree.prototype.setAllNotBeingInserted = function(node) {
+    if (!node) {
+        return;
+    }
+
+    node.insertPositions = null;
+
+    this.setAllNotBeingInserted(node.leftChild);
+    this.setAllNotBeingInserted(node.rightChild);
+}
+
 app.AVLTree.prototype.insert = function(key) {
     if (this.isAnimating) {
         return;
     }
-	if (!key || key == "") {
-		return;
-	}
-
+    if (!key || key == "") {
+        return;
+    }
+    
+    this.setAllNotBeingInserted(this.root);
     this.updateHelper(this.root, 1.0);
-	
-	this.currentTime = 0;
+    
+    this.currentTime = 0;
 
     if (this.root === null) {
         // Insert first node into the tree
@@ -77,22 +90,22 @@ app.AVLTree.prototype.insert = function(key) {
         return;
     }
 
+    var insertPositions = [];
+
     var currentNode = this.root;
-    var insertDepth = 0;
-    var insertLeftPos = 0;
 
     while (true) {
-        insertDepth++;
+        insertPositions.push(currentNode.node.position);
 
         if (currentNode.key > key) {
-            insertLeftPos = insertLeftPos * 2;
             if (currentNode.leftChild === null) {
                 // Create new node and add it to the tree
                 currentNode.leftChild = new app.AVLTreeNode(key);
                 currentNode.leftChild.parent = currentNode;
-
-                currentNode.leftChild.node.position.x = currentNode.node.position.x - currentNode.width;
-                currentNode.leftChild.node.position.y = currentNode.node.position.y - currentNode.width;
+                insertPositions.push(new THREE.Vector3(currentNode.node.position.x - currentNode.width,
+                                                       currentNode.node.position.y - currentNode.width,
+                                                       0.0));
+                currentNode.leftChild.insertPositions = insertPositions;
 
                 this.object.add(currentNode.leftChild.object);
 
@@ -104,14 +117,14 @@ app.AVLTree.prototype.insert = function(key) {
             currentNode = currentNode.leftChild;
         }
         else {
-            insertLeftPos = insertLeftPos * 2 + 1;
             if (currentNode.rightChild === null) {
                 // Create new node and add it to the tree
                 currentNode.rightChild = new app.AVLTreeNode(key);
                 currentNode.rightChild.parent = currentNode;
-
-                currentNode.rightChild.node.position.x = currentNode.node.position.x + currentNode.width;
-                currentNode.rightChild.node.position.y = currentNode.node.position.y - currentNode.width;
+                insertPositions.push(new THREE.Vector3(currentNode.node.position.x + currentNode.width,
+                                                       currentNode.node.position.y - currentNode.width,
+                                                       0.0));
+                currentNode.rightChild.insertPositions = insertPositions;
 
                 this.object.add(currentNode.rightChild.object);
 

@@ -20,24 +20,24 @@ app.init = function() {
 
     var addKeyButton = document.getElementById('add-key-button');
     var keyInput = document.getElementById('key-input');
-	app.animationSlider = document.getElementById('animation-slider');
+    app.animationSlider = document.getElementById('animation-slider');
 
     addKeyButton.addEventListener("click", function() { 
-		if (!app.tree.isAnimating) {
-			app.tree.insert(keyInput.value);
-			app.tree.isAnimating = true;
-			keyInput.value = '';
-		}
+        if (!app.tree.isAnimating) {
+            app.tree.insert(keyInput.value);
+            app.tree.isAnimating = true;
+            keyInput.value = '';
+        }
     });
 };
 
 app.render = function() {
-	if (app.tree.currentTime > app.tree.ANIMATION_TIME) {
-		app.tree.updateHelper(app.tree.root, app.animationSlider.value / 100);
-	} 
-	else {
-		app.animationSlider.value = 100 * app.tree.currentTime / app.tree.ANIMATION_TIME;
-	}
+    if (app.tree.currentTime > app.tree.ROTATE_ANIMATION_TIME + app.tree.INSERT_ANIMATION_TIME) {
+        app.tree.updateHelper(app.tree.root, app.animationSlider.value / 100);
+    }
+    else {
+        app.animationSlider.value = 100 * app.tree.currentTime / (app.tree.ROTATE_ANIMATION_TIME + app.tree.INSERT_ANIMATION_TIME);
+    }
     requestAnimationFrame(app.render);
     app.tree.update(1/60);
     app.renderer.render(app.scene, app.camera);
