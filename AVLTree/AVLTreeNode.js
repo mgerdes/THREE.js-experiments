@@ -161,6 +161,26 @@ app.AVLTreeNode.prototype.update = function(alpha) {
 
     if (alpha < 0.5) {
         if (!this.insertPositions) {
+            this.node.position.set(this.beforeFixPosition.x, this.beforeFixPosition.y, this.beforeFixPosition.z);
+            this.nodeEdges.position.set(this.beforeFixPosition.x, this.beforeFixPosition.y, -0.5);
+
+            if (this.beforeFixLeftChild && !this.beforeFixLeftChild.insertPositions) {
+                this.leftLine.visible = true;
+                this.leftLine.geometry.vertices = [this.node.position, this.beforeFixLeftChild.node.position];
+                this.leftLine.geometry.verticesNeedUpdate = true;
+            } 
+            else {
+                this.leftLine.visible = false;
+            }
+            if (this.beforeFixRightChild && !this.beforeFixRightChild.insertPositions) {
+                this.rightLine.visible = true;
+                this.rightLine.geometry.vertices = [this.node.position, this.beforeFixRightChild.node.position];
+                this.rightLine.geometry.verticesNeedUpdate = true;
+            }
+            else {
+                this.rightLine.visible = false;
+            }
+
             return;
         }
 
