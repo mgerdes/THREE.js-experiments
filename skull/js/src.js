@@ -1,8 +1,9 @@
 var app = app || { };
 
-var scene, camera, renderer, lights = [], skull; 
+var camera, renderer, lights = [], skull; 
 var particles = [];
-var animationRunner = new app.AnimationRunner(particles);
+var animationRunner;
+var currentTime = 0;
 
 var initRenderer = function() {
     renderer = new THREE.WebGLRenderer({alpha: true});
@@ -48,13 +49,17 @@ var initLights = function() {
 };
 
 var initScene = function() {
-    scene = new THREE.Scene();
+    app.scene = new THREE.Scene();
 
     for (var i = 0; i < lights.length; i++) {
-        scene.add(lights[i]);
+        app.scene.add(lights[i]);
     }
 
-    scene.add(skull);
+    app.scene.add(skull);
+};
+
+var initAnimationRunner = function() {
+    animationRunner = new app.AnimationRunner(particles);
 };
 
 var init = function() {
@@ -63,6 +68,7 @@ var init = function() {
     initLights();
     initSkull();
     initScene();
+    initAnimationRunner();
 };
 
 var updateSkull = function(dt) {
@@ -72,17 +78,21 @@ var updateSkull = function(dt) {
     skull.geometry.verticesNeedUpdate = true;
 
     skull.rotation.y = skull.userData.theta;
-    skull.userData.theta += dt * 0.5;
 };
 
 var update = function(dt) {
+    currentTime += dt;
     updateSkull(dt);
+
+    camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
+    camera.position.x = 5 * Math.cos(0.5 * currentTime);
+    camera.position.z = 5 * Math.sin(0.5 * currentTime);
 };
 
 var render = function () {
     requestAnimationFrame(render);
     update(1/60);
-    renderer.render(scene, camera);
+    renderer.render(app.scene, camera);
 };
 
 init();

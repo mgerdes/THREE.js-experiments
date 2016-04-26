@@ -1,7 +1,7 @@
 var app = app || { };
 
 app.AnimationRunner = function(particles) {
-    this.currentAnimation = new app.Animation1(particles);
+    this.currentAnimation = new app.Animation5(particles);
 };
 
 app.AnimationRunner.prototype.update = function(dt) {
