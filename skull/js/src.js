@@ -13,7 +13,7 @@ var initRenderer = function() {
 
 var initCamera = function() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera.position.y = 0;
 };
 
 var initSkull = function() {
