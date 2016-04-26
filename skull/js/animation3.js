@@ -22,6 +22,7 @@ app.Animation3.prototype.States = {
 };
 
 app.Animation3.prototype.timeToMoveToProjection = 3;
+app.Animation3.prototype.DISTANCE_BEING_MOVED_DELTA = 0.4;
 
 app.Animation3.prototype.isAllFinished = function() {
     for (var i = 0; i < this.particles.length; i++) {
@@ -103,5 +104,5 @@ app.Animation3.prototype.update = function(dt) {
         }
     }
 
-    this.distanceBeingMoved += 0.2 * dt; 
+    this.distanceBeingMoved += this.DISTANCE_BEING_MOVED_DELTA * dt; 
 };
